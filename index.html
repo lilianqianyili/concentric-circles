@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concentric Circles Interface</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital@1&family=Libre+Baskerville:ital@1&family=Cormorant+Garamond:ital@1&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0; 
+            padding: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif; 
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+        
+        #concentric-circles-container {
+            width: 100%; 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: white;
+        }
+        
+        .main-content {
+            width: 1440px; 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 48px 64px;
+        }
+        
+        .content-wrapper {
+            width: 100%; 
+            height: 100%; 
+            display: flex; 
+            gap: 64px;
+        }
+        
+        .left-area {
+            width: 55%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative;
+        }
+        
+        .right-area {
+            width: 45%; 
+            position: relative; 
+            height: 100%; 
+            visibility: hidden;
+        }
+        
+        .profile-container {
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100%;
+        }
+        
+        @keyframes rotateCircle {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .circular-selector-rotate {
+            animation: rotateCircle 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        
+        .segment-group:hover .segment-bg:not(.selected-segment) {
+            fill: #D0D0D0;
+        }
+        
+        .segment-text {
+            pointer-events: none;
+            user-select: none;
+        }
+        
+        svg {
+            max-width: 100%; 
+            max-height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="concentric-circles-container">
+        <div class="main-content">
+            <div class="content-wrapper">
+                <div class="left-area">
+                    <svg id="circularSelector" width="760" height="760" viewBox="0 0 760 760">
+                        <defs id="svgDefs"></defs>
+                        <g id="segmentsGroup"></g>
+                        <circle cx="380" cy="380" r="160" style="fill: transparent; pointer-events: none;"></circle>
+                        <g id="centerQuoteGroup">
+                            <text x="300" y="320" font-family="Georgia, serif" font-size="68" font-weight="bold" fill="#F05A28">"</text>
+                            <text x="380" y="355" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="26" font-weight="400" fill="#333333">Build trust in society and</text>
+                            <text x="380" y="377" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="26" font-weight="400" fill="#333333">solve important problems.</text>
+                            <text x="380" y="424" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="14" font-weight="600" fill="#F05A28">Hemione Hudson</text>
+                            <text x="380" y="442" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="20" font-weight="400" fill="#666666">Chair and CEO</text>
+                        </g>
+                    </svg>
+                </div>
+                <div id="rightPanel" class="right-area">
+                    <div class="profile-container">
+                        <div id="profileContent" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+const leaders = [
+    {id:1,firstName:"Hemione",lastName:"Hudson",role:"Chair and CEO",quote:"Build trust in society and solve important problems.",bio:"Hemione is Chair and CEO of PwC China, leading PwC's businesses in Chinese Mainland, Hong Kong SAR and Macau SAR. Prior to this, Hemione was PwC's Global Risk and Regulatory Officer, where she was responsible for setting the framework for and monitoring risk management and regulation across the international PwC network.",image:"https://www.pwccn.com/en/contact/h/hemione-hudson.jpg.pwcimage.200.252.jpg",segmentImage:"https://www.pwccn.com/en/contact/h/hemione-hudson.jpg.pwcimage.200.252.jpg",segmentFit:{x:230,y:55,width:240,height:240,preserve:"xMidYMid meet",scale:1.08,tx:0,ty:-6}},
+    {id:2,firstName:"Charles",lastName:"Lee",role:"Vice Chair and Managing Partner",quote:"Build trust in society and solve important problems.",bio:"Charles Lee is the Vice Chair and the Managing Partner of PwC China, leading the day-to-day operations of the firm and overseeing our Tax, Deals and Consulting businesses.",image:"https://www.pwccn.com/en/contact/c/charles-lee-2025.jpg.pwcimage.200.252.jpg",segmentImage:"https://www.pwccn.com/en/contact/c/charles-lee-2025.jpg.pwcimage.200.252.jpg",segmentFit:{x:360,y:70,width:240,height:240,preserve:"xMidYMid meet",scale:1.08,tx:0,ty:-6}},
+    {id:3,firstName:"Kevin",lastName:"Wang",role:"Vice Chair, Head of Assurance",quote:"Build trust in society and solve important problems.",bio:"Kevin Wang is the Vice chair, Head of Assurance, a member of the Management Board of PwC China and Secretary of PwC Party Committee. He provides overall leadership to the assurance services and continuously enhances audit expertise to provide high quality audit and capital markets services to clients.",image:"https://www.pwccn.com/en/contact/k/kevin-wang.jpg.pwcimage.200.252.jpg",segmentImage:"https://www.pwccn.com/en/contact/k/kevin-wang.jpg.pwcimage.200.252.jpg",segmentFit:{x:415,y:112,width:260,height:260,preserve:"xMidYMid meet",scale:1.08,tx:0,ty:-6}},
+    {id:4,firstName:"Cathy",lastName:"Huang",role:"Chief People Officer",quote:"Build trust in society and solve important problems.",bio:"Cathy Huang is the Chief People Officer and a member of the Management Board of PwC China. She overall leads the company's HR strategy, coordinates talent recruitment, development, management and corporate culture shaping, and transforms talent and human resources into the core competitiveness of the company.",image:"https://www.pwccn.com/en/contact/c/cathy-huang-2025.jpg.pwcimage.200.252.jpg",segmentImage:"https://www.pwccn.com/en/contact/c/cathy-huang-2025.jpg.pwcimage.200.252.jpg",segmentFit:{x:458,y:230,width:260,height:260,preserve:"xMidYMid meet",scale:1.08,tx:0,ty:-6}},
+    {id:5,firstName:"Damon",lastName:"Hickey",role:"Chief Operating Officer",quote:"Build trust in society and solve important problems.",bio:"Damon Hickey is the Chief Operating Officer and a member of the Management Board of PwC China. He oversees wider operational management of the firm, with a particular focus on strategic transformation initiatives, optimising firmwide execution, overseeing delivery center operations and managing the firms back-office support functions.",image:"https://www.pwccn.com/en/contact/d/damon-hickey.jpg.pwcimage.200.252.jpg",segmentImage:"https://www.pwccn.com/en/contact/d/damon-hickey.jpg.pwcimage.200.252.jpg",segmentFit:{x:450,y:350,width:235,height:235,preserve:"xMidYMid meet",scale:1.08,tx:0,ty:-6}},
+    {id:7,firstName:"Horatio",lastName:"Wong",role:"Head of Consulting",quote:"Build trust in society and solve important problems.",bio:"Horatio Wong is the Head of Consulting and a member of the Management Board of PwC China.",image:"https://www.pwccn.com/en/contact/h/horatio-wong-2025.jpg.pwcimage.200.252.jpg",segmentImage:"https://www.pwccn.com/en/contact/h/horatio-wong-2025.jpg.pwcimage.200.252.jpg",segmentFit:{x:388,y:430,width:255,height:255,preserve:"xMidYMid meet",scale:1.08,tx:0,ty:-6}},
+    {id:8,firstName:"Jaclyn",lastName:"Jhin",role:"General Counsel",quote:"Build trust in society and solve important problems.",bio:"Jaclyn Jhin is the General Counsel and a member of the Management Board of PwC China. She leads the Office of General Counsel.",image:"https://www.pwccn.com/en/contact/j/jaclyn-jhin-new3.png.pwcimage.200.252.jpg",segmentImage:"https://www.pwccn.com/en/contact/j/jaclyn-jhin-new3.png.pwcimage.200.252.jpg",segmentFit:{x:305,y:480,width:230,height:230,preserve:"xMidYMid meet",scale:1.08,tx:0,ty:-6}},
+    {id:9,firstName:"Jeff",lastName:"Yuan",role:"Head of Tax",quote:"Build trust in society and solve important problems.",bio:"Jeff Yuan is the Head of Tax and a member of the Management Board of PwC China.",image:"https://www.pwccn.com/en/contact/j/jeff-yuan.jpg.pwcimage.200.252.jpg",segmentImage:"https://www.pwccn.com/en/contact/j/jeff-yuan.jpg.pwcimage.200.252.jpg",segmentFit:{x:160,y:470,width:250,height:250,preserve:"xMidYMid meet",scale:1.08,tx:0,ty:-6}},
+    {id:10,firstName:"John",lastName:"Ryan",role:"Hong Kong SAR Assurance Leader",quote:"Build trust in society and solve important problems.",bio:"John Ryan is the Hong Kong SAR Assurance Leader and a member of the Management Board of PwC China.",image:"https://www.pwccn.com/en/contact/j/john-ryan.png.pwcimage.200.252.jpg",segmentImage:"https://www.pwccn.com/en/contact/j/john-ryan.png.pwcimage.200.252.jpg",segmentFit:{x:100,y:460,width:230,height:230,preserve:"xMidYMid meet",scale:1.00,tx:0,ty:-6,rotation:20}},
+    {id:11,firstName:"Peter",lastName:"Li",role:"Chief Risk & Regulatory Officer",quote:"Build trust in society and solve important problems.",bio:"Peter Li is the Chief Risk & Regulatory Officer and a member of the Management Board of PwC China. He provides overall leadership in these core function of R&R including Audit Independences & Compliance, Risk Governance, Ethics & Conducts, Regulatory Liaison and Crisis Management.",image:"https://www.pwccn.com/en/contact/p/peter-li-new.jpg.pwcimage.200.252.jpg",segmentImage:"https://www.pwccn.com/en/contact/p/peter-li-new.jpg.pwcimage.200.252.jpg",segmentFit:{x:25,y:350,width:235,height:235,preserve:"xMidYMid meet",scale:1.08,tx:-6,ty:-6}},
+    {id:12,firstName:"River",lastName:"Zhang",role:"Chief Financial Officer",quote:"Build trust in society and solve important problems.",bio:"River Zhang is the Chief Financial Officer and a member of the Management Board of PwC China, based in Shanghai.",image:"https://www.pwccn.com/en/contact/r/river-zhang.jpg.pwcimage.200.252.jpg",segmentImage:"https://www.pwccn.com/en/contact/r/river-zhang.jpg.pwcimage.200.252.jpg",segmentFit:{x:25,y:230,width:250,height:250,preserve:"xMidYMid meet",scale:1.08,tx:0,ty:-6}},
+    {id:13,firstName:"Sam",lastName:"Sze",role:"Head of Deals",quote:"Build trust in society and solve important problems.",bio:"Sam Sze is the Head of Deals and a member of the Management Board of PwC China. He is focused on integrating our Valuations, Transaction Services & Delivery Deals Value, Business Recovery & Lead Advisory, and Forensics businesses into a cohesive and highly impactful platform of capabilities in service of PwC's clients needs.",image:"https://www.pwccn.com/en/contact/s/sam-sze-2.jpg.pwcimage.200.252.jpg",segmentImage:"https://www.pwccn.com/en/contact/s/sam-sze-2.jpg.pwcimage.200.252.jpg",segmentFit:{x:50,y:125,width:235,height:235,preserve:"xMidYMid meet",scale:1.08,tx:0,ty:-6}},
+    {id:14,firstName:"Xing Zhou,",lastName:"Josene",role:"Head of Public Affairs",quote:"Build trust in society and solve important problems.",bio:"Xing Zhou has over 30 years of professional service experience, with a wealth of expertise in providing services to the government, facilitating external communication on major national issues, and offering consulting and management services.",image:"https://www.pwccn.com/en/contact/x/xing-zhou-new-0703-4.jpg.pwcimage.200.252.jpg",segmentImage:"https://www.pwccn.com/en/contact/x/xing-zhou-new-0703-4.jpg.pwcimage.200.252.jpg",segmentFit:{x:106,y:55,width:245,height:245,preserve:"xMidYMid meet",scale:1.08,tx:0,ty:-6}}
+];
+
+let selectedId = null, currentLanguage = 'en', isRotating = true;
+const radius = 300, centerX = 380, centerY = 380, innerRadius = 170, totalLeaders = leaders.length;
+const anglePerSegment = (2 * Math.PI) / totalLeaders, gapAngle = 0.01, rotationOffset = -anglePerSegment / 2;
+
+window.addEventListener('DOMContentLoaded', () => {
+    hideProfile();
+    renderCircularSelector();
+    setTimeout(() => {
+        isRotating = false;
+        document.getElementById('circularSelector').classList.remove('circular-selector-rotate');
+    }, 2500);
+    setTimeout(() => {
+        selectLeader(1);
+        showProfile();
+    }, 2800);
+});
+
+function createSegmentPath(index, isExpanded) {
+    const activeInnerRadius = isExpanded ? innerRadius - 8 : innerRadius;
+    const activeOuterRadius = isExpanded ? radius + 35 : radius;
+    const angleExpansion = isExpanded ? 0.08 : 0;
+    const startAngle = index * anglePerSegment - Math.PI / 2 + rotationOffset - angleExpansion + gapAngle;
+    const endAngle = (index + 1) * anglePerSegment - Math.PI / 2 + rotationOffset + angleExpansion - gapAngle;
+    const x1 = centerX + activeInnerRadius * Math.cos(startAngle), y1 = centerY + activeInnerRadius * Math.sin(startAngle);
+    const x2 = centerX + activeOuterRadius * Math.cos(startAngle), y2 = centerY + activeOuterRadius * Math.sin(startAngle);
+    const x3 = centerX + activeOuterRadius * Math.cos(endAngle), y3 = centerY + activeOuterRadius * Math.sin(endAngle);
+    const x4 = centerX + activeInnerRadius * Math.cos(endAngle), y4 = centerY + activeInnerRadius * Math.sin(endAngle);
+    return `M ${x1} ${y1} L ${x2} ${y2} L ${x3} ${y3} L ${x4} ${y4} L ${x1} ${y1} Z`;
+}
+
+function createInnerLinePath(index) {
+    const activeInnerRadius = innerRadius - 8, angleExpansion = 0.08;
+    const startAngle = index * anglePerSegment - Math.PI / 2 + rotationOffset - angleExpansion + gapAngle;
+    const endAngle = (index + 1) * anglePerSegment - Math.PI / 2 + rotationOffset + angleExpansion - gapAngle;
+    const x1 = centerX + activeInnerRadius * Math.cos(startAngle), y1 = centerY + activeInnerRadius * Math.sin(startAngle);
+    const x2 = centerX + activeInnerRadius * Math.cos(endAngle), y2 = centerY + activeInnerRadius * Math.sin(endAngle);
+    return `M ${x1} ${y1} L ${x2} ${y2}`;
+}
+
+function getTextPosition(index) {
+    const angle = (index + 0.5) * anglePerSegment - Math.PI / 2 + rotationOffset;
+    const textRadius = (radius + innerRadius) / 2;
+    return { x: centerX + textRadius * Math.cos(angle), y: centerY + textRadius * Math.sin(angle), angle };
+}
+
+function wrapText(text, maxWidth) {
+    const words = text.split(' '), lines = [], charWidth = 7;
+    let currentLine = '';
+    words.forEach(word => {
+        const testLine = currentLine + (currentLine ? ' ' : '') + word;
+        if (testLine.length * charWidth > maxWidth && currentLine) {
+            lines.push(currentLine);
+            currentLine = word;
+        } else currentLine = testLine;
+    });
+    if (currentLine) lines.push(currentLine);
+    return lines;
+}
+
+function renderCircularSelector() {
+    const svg = document.getElementById('circularSelector'), defs = document.getElementById('svgDefs'), segmentsGroup = document.getElementById('segmentsGroup');
+    defs.innerHTML = segmentsGroup.innerHTML = '';
+    
+    leaders.forEach((leader, index) => {
+        const clipPath = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
+        clipPath.id = `clip-${leader.id}`;
+        clipPath.innerHTML = `<path d="${createSegmentPath(index, leader.id===selectedId)}"/>`;
+        defs.appendChild(clipPath);
+        
+        const pattern = document.createElementNS('http://www.w3.org/2000/svg', 'pattern');
+        pattern.id = `pattern-${leader.id}`;
+        pattern.setAttribute('patternUnits', 'userSpaceOnUse');
+        pattern.setAttribute('width', '760');
+        pattern.setAttribute('height', '760');
+        
+        const defaultFit = {x:70,y:70,width:620,height:620,preserve:'xMidYMid meet',scale:1.05,tx:0,ty:0};
+        const fit = {...defaultFit, ...leader.segmentFit};
+        pattern.setAttribute('patternTransform', `translate(${fit.tx||0} ${fit.ty||0}) scale(${fit.scale||1})`);
+        
+        const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        image.setAttribute('href', leader.segmentImage);
+        image.setAttribute('x', fit.x);
+        image.setAttribute('y', fit.y);
+        image.setAttribute('width', fit.width);
+        image.setAttribute('height', fit.height);
+        image.setAttribute('preserveAspectRatio', fit.preserve);
+        pattern.appendChild(image);
+        defs.appendChild(pattern);
+    });
+    
+    const unselected = leaders.filter(l => l.id !== selectedId), selected = leaders.filter(l => l.id === selectedId);
+    [...unselected, ...selected].forEach(leader => {
+        const index = leaders.findIndex(l => l.id === leader.id), isSelected = leader.id === selectedId;
+        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        g.className = 'segment-group';
+        g.style.cursor = 'pointer';
+        g.onclick = () => selectLeader(leader.id);
+        
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.className = isSelected ? 'segment-bg selected-segment' : 'segment-bg';
+        path.setAttribute('d', createSegmentPath(index, isSelected));
+        path.setAttribute('fill', isSelected ? `url(#pattern-${leader.id})` : '#E5E5E5');
+        path.setAttribute('stroke', isSelected ? '#F05A28' : '#ffffff');
+        path.setAttribute('stroke-width', isSelected ? '3' : '2');
+        path.style.transition = 'all 0.3s ease';
+        g.appendChild(path);
+        
+        if (isSelected) {
+            const overlay = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            overlay.setAttribute('d', createSegmentPath(index, true));
+            overlay.setAttribute('fill', '#F05A28');
+            overlay.setAttribute('opacity', '0.12');
+            g.appendChild(overlay);
+            
+            const innerLine = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            innerLine.setAttribute('d', createInnerLinePath(index));
+            innerLine.setAttribute('stroke', '#F05A28');
+            innerLine.setAttribute('stroke-width', '6');
+            innerLine.setAttribute('stroke-linecap', 'round');
+            innerLine.setAttribute('fill', 'none');
+            g.appendChild(innerLine);
+        }
+        
+        const pos = getTextPosition(index);
+        let lines = leader.id === 14 && currentLanguage === 'en' ? [leader.firstName, leader.lastName] : wrapText(`${leader.firstName} ${leader.lastName}`, 90);
+        const lineHeight = 16, totalHeight = lines.length * lineHeight, startY = pos.y - totalHeight / 2 + lineHeight / 2;
+        
+        lines.forEach((line, i) => {
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.className = 'segment-text';
+            text.setAttribute('x', pos.x);
+            text.setAttribute('y', startY + i * lineHeight);
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('dominant-baseline', 'middle');
+            text.setAttribute('font-family', '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif');
+            text.setAttribute('font-size', isSelected ? '15' : '14');
+            text.setAttribute('font-weight', isSelected ? '600' : '500');
+            text.setAttribute('fill', isSelected ? 'transparent' : '#333333');
+            text.style.transition = 'all 0.3s ease';
+            text.textContent = line;
+            g.appendChild(text);
+        });
+        
+        segmentsGroup.appendChild(g);
+    });
+    
+    if (isRotating) svg.classList.add('circular-selector-rotate');
+    renderCenterQuote();
+}
+
+function selectLeader(id) {
+    selectedId = id;
+    renderCircularSelector();
+    renderProfile();
+}
+
+function hideProfile() {
+    const panel = document.getElementById('rightPanel'), profileContent = document.getElementById('profileContent');
+    if (panel) panel.style.visibility = 'hidden';
+    if (profileContent) profileContent.innerHTML = '';
+}
+
+function showProfile() {
+    const panel = document.getElementById('rightPanel');
+    if (panel) panel.style.visibility = 'visible';
+}
+
+function renderCenterQuote() {
+    const quoteGroup = document.getElementById('centerQuoteGroup');
+    quoteGroup.innerHTML = '';
+    
+    if (!selectedId) return;
+    const leader = leaders.find(l => l.id === selectedId);
+    if (!leader) return;
+    
+    const quote = currentLanguage === 'en' ? leader.quote : leader.quoteZh;
+    const name = currentLanguage === 'en' ? `${leader.firstName} ${leader.lastName}` : `${leader.lastNameZh}${leader.firstNameZh}`;
+    const role = currentLanguage === 'en' ? leader.role : leader.roleZh;
+    
+    const quoteMark = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    quoteMark.setAttribute('x', '300');
+    quoteMark.setAttribute('y', '320');
+    quoteMark.setAttribute('font-family', 'Georgia');
+    quoteMark.setAttribute('font-size', '48');
+    quoteMark.setAttribute('font-weight', 'bold');
+    quoteMark.setAttribute('fill', '#F05A28');
+    quoteMark.textContent = '"';
+    quoteGroup.appendChild(quoteMark);
+    
+    let quoteLines = wrapText(quote, 240);
+    const quoteLineHeight = 22, quoteStartY = 355;
+    
+    quoteLines.forEach((line, i) => {
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', '380');
+        text.setAttribute('y', quoteStartY + i * quoteLineHeight);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('font-family', '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif');
+        text.setAttribute('font-size', '21');
+        text.setAttribute('font-weight', '400');
+        text.setAttribute('fill', '#333333');
+        text.textContent = line;
+        quoteGroup.appendChild(text);
+    });
+    
+    const nameY = quoteStartY + quoteLines.length * quoteLineHeight + 25;
+    const nameText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    nameText.setAttribute('x', '380');
+    nameText.setAttribute('y', nameY);
+    nameText.setAttribute('text-anchor', 'middle');
+    nameText.setAttribute('font-family', '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif');
+    nameText.setAttribute('font-size', '18');
+    nameText.setAttribute('font-weight', '600');
+    nameText.setAttribute('fill', '#F05A28');
+    nameText.textContent = name;
+    quoteGroup.appendChild(nameText);
+    
+    const roleLines = wrapText(role, 260);
+    const roleLineHeight = 16, roleStartY = nameY + 18;
+    
+    roleLines.forEach((line, i) => {
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', '380');
+        text.setAttribute('y', roleStartY + i * roleLineHeight);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('font-family', '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif');
+        text.setAttribute('font-size', '16');
+        text.setAttribute('font-weight', '400');
+        text.setAttribute('fill', '#666666');
+        text.textContent = line;
+        quoteGroup.appendChild(text);
+    });
+}
+
+function renderProfile() {
+    const profileContent = document.getElementById('profileContent');
+    if (isRotating) { hideProfile(); return; }
+    showProfile();
+    
+    if (!selectedId) {
+        const placeholderText = currentLanguage === 'en' ? 'Select a leader to view their profile' : '选择一位领导查看其简介';
+        profileContent.innerHTML = `<div style="height: 100%; display: flex; align-items: center; justify-content: center;"><p style="color: #9ca3af; font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; margin: 0;">${placeholderText}</p></div>`;
+        return;
+    }
+    
+    const leader = leaders.find(l => l.id === selectedId);
+    if (!leader) return;
+    
+    const name = currentLanguage === 'en' ? `${leader.firstName} ${leader.lastName}` : `${leader.lastNameZh}${leader.firstNameZh}`;
+    const role = currentLanguage === 'en' ? leader.role : leader.roleZh;
+    const bio = currentLanguage === 'en' ? leader.bio : leader.bioZh;
+    
+    const shouldUsePlaceholder = !leader.image || leader.image === 'ORANGE_BACKGROUND';
+    const imageHTML = shouldUsePlaceholder ? 
+        `<div style="width: 240px; height: 340px; border-radius: 8px; flex-shrink: 0; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);"></div>` :
+        `<div style="width: 240px; height: 340px; border-radius: 8px; overflow: hidden; flex-shrink: 0; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); position: relative;">
+            <img src="${leader.image}" alt="${name}" style="width: 100%; height: 100%; object-fit: cover; object-position: top; display: block;">
+            <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 96px; background: linear-gradient(to top, rgba(0, 0, 0, 0.2), transparent);"></div>
+        </div>`;
+    
+    profileContent.innerHTML = `
+        <div style="height: 100%; display: flex; flex-direction: column; animation: slideInRight 0.3s ease-out;">
+            <div style="margin-bottom: 32px; display: flex; gap: 24px; align-items: flex-end;">
+                ${imageHTML}
+                <div style="flex: 1; padding-bottom: 8px;">
+                    <div style="width: 48px; height: 4px; background: #F05A28; margin-bottom: 20px; border-radius: 9999px;"></div>
+                    <h2 style="font-size: 32px; font-weight: 600; color: #1a1a1a; margin: 0 0 12px 0; line-height: 1.2; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">${name}</h2>
+                    <p style="font-size: 17px; font-weight: 500; color: #F05A28; line-height: 1.5; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">${role}</p>
+                </div>
+            </div>
+            <div style="position: relative;">
+                <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: rgba(240, 90, 40, 0.3); border-radius: 9999px;"></div>
+                <div style="padding-left: 20px; padding-right: 8px; padding-top: 16px; padding-bottom: 16px; background: rgba(249, 250, 251, 0.5); border-radius: 8px; border-left: 3px solid transparent;">
+                    <p style="font-size: 15px; line-height: 1.7; color: #4b5563; margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">${bio}</p>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function switchLanguage(lang) {
+    currentLanguage = lang;
+    const enBtn = document.getElementById('langEn'), zhBtn = document.getElementById('langZh');
+    if (lang === 'en') {
+        enBtn.style.background = '#F05A28'; enBtn.style.color = 'white';
+        zhBtn.style.background = 'transparent'; zhBtn.style.color = '#6b7280';
+    } else {
+        zhBtn.style.background = '#F05A28'; zhBtn.style.color = 'white';
+        enBtn.style.background = 'transparent'; enBtn.style.color = '#6b7280';
+    }
+    renderCircularSelector();
+    renderProfile();
+}
+</script>
+</body>
+</html>
